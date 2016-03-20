@@ -1,0 +1,56 @@
+#loading_spinner { display:none; }
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+#wrapper {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  overflow-x: scroll;
+  /*remove annoying margin created by display:inline-block;*/
+  font-size: 0;
+}
+.a,
+.b,
+.c,
+.d,
+.e {
+  width: 30%;
+  height: 85%;
+  vertical-align: top;
+  background-size: contain;
+  background-repeat: no-repeat;
+  display: inline-block;
+  -o-background-size: cover;
+  -moz-background-size: cover;
+  -webkit-background-size: cover;
+  -ms-background-size: cover;
+  background-size: cover;
+  color:#000000;
+  font-size:large;
+  border-style: outset;
+  overflow: scroll;
+  background-position:center center;
+}
+.a {
+  
+}
+.b {
+  
+}
+.c {
+  
+}
+.d {
+  
+}
+.e {
+  
+}
