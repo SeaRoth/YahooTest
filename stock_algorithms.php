@@ -14,7 +14,7 @@ $stockList = fetchAllStockSymbols();
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.9.3/typeahead.min.js"></script>
-
+  <script src="include/cookies.js" type="application/javascript"></script>
   
   <script type="application/javascript">
     $(function(){
@@ -27,6 +27,15 @@ $stockList = fetchAllStockSymbols();
   
   <script type="text/javascript">
     $(document).ready(function(){
+        var myArray = new Array();
+        
+        if(getCookie("recent_search_symbols") != ""){
+            myArray = getCookie("recent_search_symbols");
+            document.getElementById('recent-search-list').innerHTML = myArray;
+        }else{
+            setCookie("recent_search_symbols", myArray, 30);
+        }
+        
         $('input.typeahead').typeahead({
             name: 'accounts',
             local: <?php echo json_encode($stockList); ?> 
@@ -42,11 +51,14 @@ $stockList = fetchAllStockSymbols();
             success: function(data) {
                 $('.a').html(data);
         //Moved the hide event so it waits to run until the prior event completes
-        //It hide the spinner immediately, without waiting, until I moved it here
+        //It hide the spinner immediately, without waiting, until I moved it herr
                 $('#loading_spinner').hide();
-                document.getElementById('recent-search-list').innerHTML = document.getElementById('recent-search-list').innerHTML + " " + selection.value;
                 
+                var firstDivContent = document.getElementById('a');
+                var secondDivContent = document.getElementById('b');
+                secondDivContent.innerHTML = firstDivContent.innerHTML;
                 
+                myArray.push(3);
                 
             },
             error: function() {
@@ -72,8 +84,8 @@ $stockList = fetchAllStockSymbols();
 <img id="loading_spinner" src="images/spinner.gif">
 
   <div id="wrapper">
-    <div class="a">Text</div>
-    <div class="b"></div>
+    <div id="a" class="a">Text</div>
+    <div id="b" class="b"></div>
     <div class="c">Text</div>
     <div class="d">Text</div>
     <div class="e">Text</div>
