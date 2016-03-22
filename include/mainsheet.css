@@ -15,14 +15,10 @@ body {
   white-space: nowrap;
   overflow-x: scroll;
   /*remove annoying margin created by display:inline-block;*/
-  font-size: 0;
 }
-.a,
-.b,
-.c,
-.d,
-.e {
-  width: 30%;
+
+.a{
+  width: auto;
   height: 85%;
   vertical-align: top;
   background-size: contain;
@@ -34,23 +30,30 @@ body {
   -ms-background-size: cover;
   background-size: cover;
   color:#000000;
+  margin-left:5px;
   font-size:large;
-  border-style: outset;
-  overflow: scroll;
+  border: 1px solid black;
   background-position:center center;
 }
-.a {
-  
+.b{
+	height: 85%;
+	width: 75%;
+	font-size: large;
+	border: 2px solid black;
+    vertical-align: top;
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+    -o-background-size: cover;
+    -moz-background-size: cover;
+    -webkit-background-size: cover;
+    -ms-background-size: cover;
+    background-size: cover;
+    color:#000000;
+    margin-left:5px;
+    background-position:center center;
 }
-.b {
-  
+#checkbox{
+	margin-left: 10px;
 }
-.c {
-  
-}
-.d {
-  
-}
-.e {
-  
-}
+

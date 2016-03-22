@@ -1,5 +1,6 @@
 <?php
 require_once('dbHelper.php');
+require_once('nyse_functions.php');
 require('myClass.php');
 session_start();
 $stockList = fetchAllStockSymbols();
@@ -58,7 +59,7 @@ $stockList = fetchAllStockSymbols();
                 var secondDivContent = document.getElementById('b');
                 secondDivContent.innerHTML = firstDivContent.innerHTML;
                 
-                myArray.push(3);
+                myArray.push(34);
                 
             },
             error: function() {
@@ -84,15 +85,39 @@ $stockList = fetchAllStockSymbols();
 <img id="loading_spinner" src="images/spinner.gif">
 
   <div id="wrapper">
-    <div id="a" class="a">Text</div>
-    <div id="b" class="b"></div>
-    <div class="c">Text</div>
-    <div class="d">Text</div>
-    <div class="e">Text</div>
-
+    <div id="a" class="a">
+        <input id="checkbox" class="checkbox_left" type="checkbox" checked="checked"> $ > 5 </input>
+        <div></div>
+        <input id="checkbox" type="checkbox" aria-label="Checkbox" checked="checked"> OutstandingShares < 300M </input>   
+        <div></div>
+        <input id="checkbox" type="checkbox" aria-label="Checkbox" checked="checked"> OutstandingShares > 5M </input>
+        <div></div>
+        <input id="checkbox" type="checkbox" aria-label="Checkbox" checked="checked"> Declined 30% from 52-week high </input>
+        <div></div>
+        <input id="checkbox" type="checkbox" aria-label="Checkbox" checked="checked"> 3-consecutive months increasing S.I. </input>
+        <div></div>
+        <input id="checkbox" type="checkbox" aria-label="Checkbox" checked="checked"> Declined at least 10% from yest </input>
+        <div></div>
+        <input id="checkbox" type="checkbox" aria-label="Checkbox" checked="checked"> Doubled Volume in today </input>                
+    </div>
+    
+    <div id="b" class="b">
+        <br>
+        <?php
+            $mSymbolsArray = fetchAllStockSymbols();
+            //for($i=0;$i<count($mSymbolsArray);$i++){
+            for($i=0;$i<2;$i++){  
+                $eligibleStocksArray = fetchEligibleStockInformation($mSymbolsArray[$i]);
+                echo "<br> <br>";
+                var_dump($eligibleStocksArray);
+                createEligibleTableAndInsert($eligibleStocksArray);    
+            }
+            
+        ?>    
+        
+    </div>
+    
   </div>
-
-
 
 </body>
 </html>

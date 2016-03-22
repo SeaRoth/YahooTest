@@ -14,12 +14,49 @@ $password = "";
 $dbname = "all_nyse_stocks";
 
 /*
+ * changeDatabaseEntryType
  * 
+ * Description: Function will iterate through every database entry and change it's respective type
+ * 
+ * Input: 
+ *  -$dbName
+ *  -$columnName
+ *  -$newType
+ * Output: SUCCESS OR FAILURE
+ * 
+ * newTYpes:
+ *  1. int
+ *  2. DECIMAL(15,3) [15 significant digits plus 3 precision]
+ * 
+ * e.g. function call: changeDatabaseEntryType("eligible_stocks", "52WeekLow", "DECIMAL(15,3)");
+ */
+ function changeDatabaseEntryType($dbName, $columnName, $newType){
+    $mSymbolsArray = fetchAllStockSymbols();
+    global $servername, $username, $password;
+    
+    for($i=0;$i<count($mSymbolsArray);$i++){
+        try {
+            $conn = new PDO("mysql:host=$servername;dbname=$dbName", $username, $password);
+            // set the PDO error mode to exception
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+            // sql to create table
+            $sqlCreate = "ALTER TABLE " . $mSymbolsArray[$i] . " MODIFY " . $columnName . " " . $newType;
+        
+            // use exec() because no results are returned
+            $conn->exec($sqlCreate);
+            echo "Finished altering " . $mSymbolsArray[$i] . " " . $i . "/" . count($mSymbolsArray) . " to " . $newType . "<br>";
+        }
+        catch(PDOException $e)
+        { echo $sqlCreate . "<br>" . $e->getMessage() . "<br><br>"; }    
+    }
+ } 
+
+/*
  * checkIfRowExists
  * 
  * Input: Table name and row's date (primary key)
- * Output: True or false
- * 
+ * Output: True or false 
  */
 function checkIfRowExists($tableName, $date){
     global $servername, $username, $password, $dbname;
@@ -35,6 +72,31 @@ function checkIfRowExists($tableName, $date){
         return TRUE;
     }
 }
+
+/*
+ * compareAskToYearlyHigh($mSymbol)
+ * 
+ * Input: Stock's symbol
+ * Output: Ask and 52 week high
+ * 
+ */ 
+ function compareAskToYearlyHigh($mSymbol){
+    global $servername, $username, $password;
+    $dbname = "eligible_stocks";
+
+     try {
+         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+         $stmt = $conn->prepare("SELECT ask,52WeekHigh from $mSymbol");
+         $stmt->execute();
+         $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);  
+         return $stmt->fetchAll();
+    }
+    catch(PDOException $e) {
+         echo "Error: " . $e->getMessage();
+    }
+    $conn = null;
+ }
 
 /*
  * checkIfTableExists
@@ -83,18 +145,23 @@ function fetchAllStockSymbols(){
 /*
  * fetchEligibleStocks
  * 
- * Input: None
- * Output: 
+ * Input: 
+ *  -$mTableName
+ *  -$mMinPrice
+ *  -$mMaxPrice
+ *  -$mMinShares
+ *  -$mMaxShares
+ * Output: Array of eligible stocks
  * 
  */
- 
- function fetchEligibleStocks(){
-     global $servername, $username, $password, $dbname;
-    
+ function fetchEligibleStocks($mTableName, $mMinPrice, $mMaxPrice, $mMinShares, $mMaxShares){
+     global $servername, $username, $password;
+     $dbname = "eligible_stocks"; 
+        
     try {
          $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
          $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-         $stmt = $conn->prepare("SELECT * FROM BKMU WHERE outstandingShares > 3000");
+         $stmt = $conn->prepare("SELECT symbol FROM $mTableName WHERE ask > $mMinPrice AND ask < $mMaxPrice AND outstandingShares > $mMinShares AND outstandingShares < $mMaxShares");
          $stmt->execute();
          $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);  
          return $stmt->fetchAll();
@@ -177,6 +244,62 @@ function fetchCertainStock($stockSymbol){
     { echo $sqlCreate . "<br>" . $e->getMessage() . "<br><br>"; }
     $conn = null;       
  }
+ 
+ /*
+  * createEligibleTableAndInsert($mArray)
+  * 
+  * Input: Array of values
+  * Output: Nothing
+  */ 
+  function createEligibleTableAndInsert($mArray){
+    global $servername, $username, $password;
+    $dbname = "eligible_stocks";
+    $stockSymbol = $mArray[1];
+
+    try {
+        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+        // set the PDO error mode to exception
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+        // sql to create table
+        $sqlCreate = "CREATE TABLE IF NOT EXISTS $stockSymbol(
+        date varchar(15) NOT NULL PRIMARY KEY,
+        symbol varchar(6),
+        name varchar(60),
+        ask varchar(20),
+        outstandingShares varchar(20),
+        lastTradeSize varchar(20),
+        averageDailyVolume varchar(20),
+        pERatio varchar(20),
+        shortRatio varchar(20),
+        52WeekHigh varchar(20),
+        52WeekHighPercentChange varchar(20),
+        52WeekLow varchar(20),
+        52WeekLowPercentChange varchar(20)
+        )";
+    
+        // use exec() because no results are returned
+        $conn->exec($sqlCreate);
+    }
+    catch(PDOException $e)
+    { echo $sqlCreate . "<br>" . $e->getMessage() . "<br><br>"; }
+    
+    try {
+        $sqlInsert = "INSERT INTO $stockSymbol
+         (date, symbol, name, ask, outstandingShares, lastTradeSize, averageDailyVolume, pERatio, shortRatio, 52WeekHigh,
+          52WeekHighPercentChange, 52WeekLow, 52WeekLowPercentChange)
+        VALUES ('$mArray[0]', '$mArray[1]', '$mArray[2]', '$mArray[3]', '$mArray[4]', '$mArray[5]', '$mArray[6]', '$mArray[7]',
+         '$mArray[8]', '$mArray[9]', '$mArray[10]', '$mArray[11]', '$mArray[12]')";
+        
+        // use exec() because no results are returned
+        $conn->exec($sqlInsert);
+    }
+    catch(PDOException $e)
+    {
+        echo $sqlInsert . "<br>" . $e->getMessage();
+    }        
+    $conn = null;        
+  }
 
 /*
  * createTableAndInsert($tableName, $objects)

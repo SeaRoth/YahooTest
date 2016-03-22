@@ -1,73 +1,32 @@
 <?php
 require_once('dbHelper.php');
-require_once('nyse_functions.php');
-
 
 /*
- * function
+ * fetchEligibleSTockInformation
  * 
- * 
- * 
- * 
+ * Input: Symbol
+ * Output: Array of information
  */ 
-function fetchStockInformationStuff(){
+function fetchEligibleStockInformation($mStockSymbol){
     /*
-        n  = name 
-        s  = symbol 
-        o  = open  
-        p  = previousClose 
-        v  = volume 
-        a2 = averageDailyVolume 
-        c  = change_percentChange 
-        c1 = dayChange 
-        currency 
-        c8 = afterHoursChangeRealtime
-        g  = daysLow
-        h  = daysHigh
-        yearLow 
-        yearHigh
-        c6 = changePercentRealtime
-        k4 = changeFromYearHigh 
-        k5 = percentChangeFromYearHigh
-        m  = daysRange
-        m2 = daysRangeRealtime
-        m3 = fiftyDayMovingAverage
-        m4 = twoHundredDayMovingAverage
-        m5 = changeFromTwoHundredDayMovingAverage
-        m7 = changeFromFiftyDayMovingAverage
-        m8 = percentChangeFromFiftyDayMovingAverage
-     */
-    
-    $mStockSymbol = "CSX";
-    $mSpecs = "nsopva2c1c8ghc6k4k5mm2m3m4m5m7m8";  
+     * d1 = last trade date [varchar]
+     * s  = symbol [varchar]
+     * n  = name [varchar]
+     * a  = ask [double(15,3)]
+     * j2 = outstanding shares [int]
+     * k3 = last trade size [int]
+     * a2 = average daily volume [int]
+     * r  = P/E ratio [double(15,3)]
+     * s7 = short ratio [double(15,3)]
+     * k  = 52-week high [double(15,3)]
+     * k5 = percent change from 52 week high [varchar(20)]
+     * j  = 52-week low [double(15,3)]
+     * j6 = percent change from 52 week low [varchar(20)]
+     */ 
+    $mSpecs = "d1snaj2k3a2rs7kk5jj6";  
     $thisArray = fetchCertainDataForSelectStock($mStockSymbol, $mSpecs);
     $thisArray = array_shift($thisArray);
-    
-    $mName = $thisArray[0];
-    $mSymbol = $thisArray[1];
-    $mOpen = $thisArray[2];
-    $mPreviousClose = $thisArray[3];
-    $mVolume = $thisArray[4];
-    $mAverageDailyVolume = $thisArray[5];
-    $mChange_percentChange = $thisArray[6];
-    $mdayCHange = $thisArray[7];
-    $mAfterHoursChangeRealtime = $thisArray[8];
-    $mDaysLow = $thisArray[9];
-    $mDaysHigh = $thisArray[10];
-    $mChangePercentRealtime = $thisArray[11];
-    $mchangeFromYearHigh = $thisArray[12];
-    $mPercentChangeFromYearHigh = $thisArray[13];
-    $mDaysRange = $thisArray[14];
-    $mDaysRangeRealtime = $thisArray[15];
-    $mFiftyDayMovingAverage = $thisArray[16];
-    $mTwoHundredDayMovingAverage = $thisArray[17];
-    $mChangeFromTwoHundredDayMoingAverage = $thisArray[18];
-    $mChangeFromFiftyDayMovingAverage = $thisArray[19];
-    
-    for($i=0;$i<count($thisArray);$i++){
-        echo $thisArray[$i] . "<br>";
-    }
-    var_dump(checkIfTableExists("YHOO"));    
+    return $thisArray;
 }
       
 /*
@@ -78,7 +37,6 @@ function fetchStockInformationStuff(){
  *  $parameters: Separated by commas 
  *      -http://wern-ancheta.com/blog/2015/04/05/getting-started-with-the-yahoo-finance-api/
  * Output: Array with values
- * 
  */
 function fetchCertainDataForSelectStock($symbol, $parameters){
     $url = 'http://finance.yahoo.com/d/quotes.csv?s=' . $symbol . '&f=' . $parameters;
@@ -105,7 +63,6 @@ function fetchCertainDataForSelectStock($symbol, $parameters){
     $thisArray = explode($delimiter, $thisString);
     return $thisArray;
  }
- 
        
 /*
  * parseTextFile($file)
@@ -141,8 +98,7 @@ function removeNewLinesFromString($theString){
     return preg_replace("/[\n\r]/","",$theString);  
 }
  
- 
-/**
+/*
  * removeNewLinesFromTextFile($inputFileLocation, $outputFileLocation)
  * 
  * Input: File's input and output locations 
