@@ -13,7 +13,7 @@ $client = new \Scheb\YahooFinanceApi\ApiClient();
 $yahoo = new U_Yahoo();
 
 echo "<b> yahoo->getHistoryQuote </b> <br> ";
-$yahooHistorical = $yahoo->getHistoryQuote('YHOO', 5, 0);
+$yahooHistorical = $yahoo->getHistoryQuote('GSPC', 5, 0);
 var_dump($yahooHistorical);
 echo "<br> <br>";
 

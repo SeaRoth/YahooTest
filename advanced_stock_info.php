@@ -1,6 +1,6 @@
 <?php
 require('myClass.php');
-include_once('nyse_functions.php');
+include_once('functions_stocks.php');
 session_start();
 
 /*

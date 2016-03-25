@@ -61,7 +61,7 @@ $dbname = "all_nyse_stocks";
 function checkIfRowExists($tableName, $date){
     global $servername, $username, $password, $dbname;
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-    $stmt = $conn->prepare('SELECT * FROM aame WHERE date=?');
+    $stmt = $conn->prepare('SELECT date FROM $tableName WHERE date=$date');
     $stmt->bindParam(1, $date, PDO::PARAM_INT);
     $stmt->execute();
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -84,7 +84,7 @@ function checkIfRowExists($tableName, $date){
     global $servername, $username, $password;
     $dbname = "eligible_stocks";
 
-     try {
+    try {
          $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
          $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
          $stmt = $conn->prepare("SELECT ask,52WeekHigh from $mSymbol");
@@ -141,6 +141,53 @@ function fetchAllStockSymbols(){
     }
     return $mArray;
 }
+
+/*
+ * fetchCloseValues($mSymbol)
+ * 
+ * Input: $mSymbol
+ * Output: 
+ */ 
+function fetchCloseValues($mSymbol){
+    global $servername, $username, $password, $dbname;
+    
+    try {
+         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+         $stmt = $conn->prepare("SELECT close FROM $mSymbol");
+         $stmt->execute();
+         $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);  
+         return $stmt->fetchAll();
+    }
+    catch(PDOException $e) {
+         echo "Error: " . $e->getMessage();
+    }
+    $conn = null;    
+} 
+
+/*
+ * fetchGapInTradingValues($mSymbol)
+ * 
+ * Input: Stock's symbol
+ * Output: Open and Close Values
+ * 
+ */
+function fetchGapInTradingValues($mSymbol, $mDaysInPast){
+    global $servername, $username, $password, $dbname;
+    
+    try {
+         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+         $stmt = $conn->prepare("SELECT date,open,close from $mSymbol LIMIT " . $mDaysInPast);
+         $stmt->execute();
+         $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);  
+         return $stmt->fetchAll();
+    }
+    catch(PDOException $e) {
+         echo "Error: " . $e->getMessage();
+    }
+    $conn = null;    
+} 
 
 /*
  * fetchEligibleStocks
@@ -348,7 +395,6 @@ function createTableAndInsert($tableName, $objects){
         differenceFromTwoHundredDayMovingAverage varchar(20),
         differenceFromFiftyDayMovingAverage varchar(20),
         percentDifferenceFromFiftyDayMovingAverage varchar(20)
-       
         )";
     
         // use exec() because no results are returned
@@ -358,7 +404,7 @@ function createTableAndInsert($tableName, $objects){
     { echo $sqlCreate . "<br>" . $e->getMessage() . "<br><br>"; }
     
     try {
-        $sqlInsert = "INSERT INTO $tableName
+        $sqlInsert = "INSERT IGNORE INTO $tableName
          (date, name, symbol, outstandingShares, open, high, low, close, volume)
         VALUES ('$objects[Date]', '$objects[Name]', '$objects[Symbol]', '$objects[outstanding_shares]', '$objects[Open]', '$objects[High]', '$objects[Low]', '$objects[Close]', '$objects[Volume]')";
         

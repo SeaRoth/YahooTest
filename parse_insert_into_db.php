@@ -10,7 +10,8 @@ require_once 'vendor/scheb/yahoo-finance-api/ApiClient.php';
 require_once 'vendor/scheb/yahoo-finance-api/HttpClient.php';
 require_once 'vendor/scheb/yahoo-finance-api/Exception/HttpException.php';
 require_once 'vendor/scheb/yahoo-finance-api/Exception/ApiException.php';
-include_once('nyse_functions.php');
+include_once('functions_stocks.php');
+include_once('functions_files.php');
 include_once('dbHelper.php');
 include_once('yahooFinanceHelper.php');
 
@@ -19,8 +20,7 @@ $mTextFile = parseTextFile('include/stock_list.txt');
 $yahooFinanceAPIClient = new \Scheb\YahooFinanceApi\ApiClient();
 $time_pre = microtime(true);
   
-//for($i = 361; $i < count($mTextFile); $i++ ){
-for($i = 0; $i < 6; $i++ ){
+for($i = 361; $i < count($mTextFile); $i++ ){
     //find value and shares outstanding
     $sharesOustanding = file_get_contents('http://finance.yahoo.com/d/quotes.csv?s=' . $mTextFile[$i]['Symbol'] . '&f=j2,p');
     $sharesOustandingArray = explode(",", $sharesOustanding);
@@ -34,7 +34,8 @@ for($i = 0; $i < 6; $i++ ){
     echo "<br>";
     
     //get the last 90 days of trading information
-    $yahooHistorical = $yahoo->getHistoryQuote($mTextFile[$i]['Symbol'], 90, 0); 
+    $yahooHistorical = $yahoo->getHistoryQuote($mTextFile[$i]['Symbol'], 90, 0);
+    // get the last 90 days of trading information
     foreach($yahooHistorical as $key=>$arrayData) {
             $arrayData    = get_object_vars($arrayData);
             if(checkIfRowExists($arrayData['Symbol'], $arrayData['Date']) == TRUE){
@@ -47,7 +48,7 @@ for($i = 0; $i < 6; $i++ ){
                     $arrayData['outstanding_shares'] = 0;
                 }
                 $arrayData['Name'] = $mTextFile[$i]['Security Name'];
-                //createTableAndInsert($arrayData['Symbol'], $arrayData);                
+                createTableAndInsert($arrayData['Symbol'], $arrayData);                
             }
     } 
     sleep(.25);      

@@ -7,6 +7,8 @@ body {
   margin: 0;
   padding: 0;
 }
+
+
 #wrapper {
   width: 100%;
   height: 100%;
@@ -14,7 +16,19 @@ body {
   padding: 0;
   white-space: nowrap;
   overflow-x: scroll;
-  /*remove annoying margin created by display:inline-block;*/
+  display: inline-block;
+}
+
+#basic-addon1{
+	width: 200px;
+}
+
+#form-control{
+	width: auto;
+}
+
+#input-group{
+	width: auto;
 }
 
 .a{
@@ -30,6 +44,7 @@ body {
   -ms-background-size: cover;
   background-size: cover;
   color:#000000;
+  background-color:#999999;
   margin-left:5px;
   font-size:large;
   border: 1px solid black;
