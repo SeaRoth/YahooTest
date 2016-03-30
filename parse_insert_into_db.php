@@ -19,8 +19,9 @@ $yahoo = new U_Yahoo();
 $mTextFile = parseTextFile('include/stock_list.txt');                                            
 $yahooFinanceAPIClient = new \Scheb\YahooFinanceApi\ApiClient();
 $time_pre = microtime(true);
+//361 AND 1546
   
-for($i = 361; $i < count($mTextFile); $i++ ){
+for($i = 0; $i < 361; $i++ ){
     //find value and shares outstanding
     $sharesOustanding = file_get_contents('http://finance.yahoo.com/d/quotes.csv?s=' . $mTextFile[$i]['Symbol'] . '&f=j2,p');
     $sharesOustandingArray = explode(",", $sharesOustanding);

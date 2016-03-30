@@ -8,14 +8,12 @@ body {
   padding: 0;
 }
 
-
 #wrapper {
-  width: 100%;
+  width: auto;
   height: 100%;
   margin: 0;
   padding: 0;
   white-space: nowrap;
-  overflow-x: scroll;
   display: inline-block;
 }
 
@@ -52,7 +50,7 @@ body {
 }
 .b{
 	height: 85%;
-	width: 75%;
+	width: auto;
 	font-size: large;
 	border: 2px solid black;
     vertical-align: top;

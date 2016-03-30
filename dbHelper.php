@@ -198,7 +198,7 @@ function fetchGapInTradingValues($mSymbol, $mDaysInPast){
  *  -$mMaxPrice
  *  -$mMinShares
  *  -$mMaxShares
- * Output: Array of eligible stocks
+ * Output: Stock Symbol or NULL
  * 
  */
  function fetchEligibleStocks($mTableName, $mMinPrice, $mMaxPrice, $mMinShares, $mMaxShares){
@@ -210,15 +210,16 @@ function fetchGapInTradingValues($mSymbol, $mDaysInPast){
          $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
          $stmt = $conn->prepare("SELECT symbol FROM $mTableName WHERE ask > $mMinPrice AND ask < $mMaxPrice AND outstandingShares > $mMinShares AND outstandingShares < $mMaxShares");
          $stmt->execute();
-         $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);  
-         return $stmt->fetchAll();
+         $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+         $returnValue = $stmt->fetchAll(); 
+         return array_shift($returnValue);
     }
     catch(PDOException $e) {
          echo "Error: " . $e->getMessage();
     }
     $conn = null;
  } 
-
+ 
 /*
  * fetchCSVFromTable
  * 

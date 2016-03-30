@@ -1,83 +1,90 @@
 <?php
 require_once('dbHelper.php');
-include_once('functions_stocks.php');
-require('myClass.php');
+require_once('functions_stocks.php');
+require_once('myClass.php');
 session_start();
 $stockList = fetchAllStockSymbols();
-
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.9.3/typeahead.min.js"></script>
-  <script src="include/cookies.js" type="application/javascript"></script>
-  
-  <script type="application/javascript">
-    $(function(){
-        $(".dropdown-menu li a").click(function(){
-          $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
-          $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
-        });
-    });  
-  </script>
-  
-  <script type="application/javascript">
+    <meta name="viewport" charset="utf-8" content="width=device-width, initial-scale=1">
+      
+    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.9.3/typeahead.min.js"></script>
+    <script src="include/cookies.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="include/css_for_autocomplete.css">
+    <link rel="stylesheet" type="text/css" href="include/mainsheet.css">
     
-  </script>
-  
-  <script type="text/javascript">
-    $(document).ready(function(){
-        var myArray = new Array();
-        
-        if(getCookie("recent_search_symbols") != ""){
-            myArray = getCookie("recent_search_symbols");
-            document.getElementById('recent-search-list').innerHTML = myArray;
-        }else{
-            setCookie("recent_search_symbols", myArray, 30);
-        }
-        
-        $('input.typeahead').typeahead({
-            name: 'accounts',
-            local: <?php echo json_encode($stockList); ?> 
-        }).on('typeahead:selected', function(event, selection){
-          
-        $('#loading_spinner').show();
-        var post_data = "symbol="+selection.value;
-        $.ajax({
-            url: 'advanced_stock_info.php?symbol=' + selection.value,
-            type: 'POST',
-            data: post_data,
-            dataType: 'html',
-            success: function(data) {
-                $('.b').html(data);
-        //Moved the hide event so it waits to run until the prior event completes
-        //It hide the spinner immediately, without waiting, until I moved it herr
-                $('#loading_spinner').hide();
-                
-                
-//COPY FIRST DIV TO SECOND
-                // var firstDivContent = document.getElementById('a');
-                // var secondDivContent = document.getElementById('b');
-                // secondDivContent.innerHTML = firstDivContent.innerHTML;
-                
-                myArray.push(34);
-                
-            },
-            error: function() {
-                alert("Something went wrong!");
+    <script type="text/javascript">
+        $(document).ready(function(){
+            
+            if(getCookie("minPrice") != ""){
+                document.getElementById('minPrice').value = getCookie('minPrice');    
             }
-        });           
-          $(this).typeahead('setQuery', '');
-        });        
-    });  
-</script>
-<link rel="stylesheet" type="text/css" href="include/css_for_autocomplete.css">
-<link rel="stylesheet" type="text/css" href="include/mainsheet.css">
+            if(getCookie("maxPrice") != ""){
+                document.getElementById('maxPrice').value = getCookie('maxPrice');    
+            }        
+            if(getCookie("minBeta") != ""){
+                document.getElementById('minBeta').value = getCookie('minBeta');    
+            }
+            if(getCookie("minShares") != ""){
+                document.getElementById('minShares').value = getCookie('minShares');    
+            }
+            if(getCookie("maxShares") != ""){
+                document.getElementById('maxShares').value = getCookie('maxShares');    
+            }
+            if(getCookie("declinedYear") != ""){
+                document.getElementById('declinedYear').value = getCookie('declinedYear');    
+            }
+            if(getCookie("monthsSIGrowth") != ""){
+                document.getElementById('monthsSIGrowth').value = getCookie('monthsSIGrowth');    
+            }
+            if(getCookie("perDeclinedYest") != ""){
+                document.getElementById('perDeclinedYest').value = getCookie('perDeclinedYest');    
+            }
+            if(getCookie("dailyAvgVol") != ""){
+                document.getElementById('dailyAvgVol').value = getCookie('dailyAvgVol');
+                //alert(dailyAvgVol.value);    
+            }
+            if(getCookie("gapTrading") != ""){
+                document.getElementById('gapTrading').value = getCookie('gapTrading');    
+            }
+            
+            $('input.typeahead').typeahead({
+                name: 'accounts',
+                local: <?php echo json_encode($stockList); ?> 
+            }).on('typeahead:selected', function(event, selection){
+              
+            $('#loading_spinner').show();
+            var post_data = "symbol="+selection.value;
+            $.ajax({
+                url: 'advanced_stock_info.php?symbol=' + selection.value,
+                type: 'POST',
+                data: post_data,
+                dataType: 'html',
+                success: function(data) {
+                    $('.b').html(data);
+            //Moved the hide event so it waits to run until the prior event completes
+            //It hide the spinner immediately, without waiting, until I moved it herr
+                    $('#loading_spinner').hide();
+                                    
+    //COPY FIRST DIV TO SECOND
+                    // var firstDivContent = document.getElementById('a');
+                    // var secondDivContent = document.getElementById('b');
+                    // secondDivContent.innerHTML = firstDivContent.innerHTML;
+                },
+                error: function() {
+                    alert("Something went wrong!");
+                }
+            });           
+              $(this).typeahead('setQuery', '');
+            });        
+        });  
+    </script>
   
 </head>
 <body>
@@ -88,7 +95,9 @@ $stockList = fetchAllStockSymbols();
     <p id="recent-search-list">Recent Stocks: </p>
 </div>
 
-<img id="loading_spinner" src="images/spinner.gif">
+<div>
+    <img id="loading_spinner" src="images/spinner.gif">
+</div>
 
   <div id="wrapper">
       
@@ -126,7 +135,7 @@ $stockList = fetchAllStockSymbols();
         
         <div class="input-group">
           <span class="input-group-addon" id="basic-addon1">Declined % from 52-week:</span>
-          <input type="text" id="declined52" class="form-control" placeholder="Example: 30% or 30" aria-describedby="basic-addon1"
+          <input type="text" id="declinedYear" class="form-control" placeholder="Example: 30% or 30" aria-describedby="basic-addon1"
           onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
         </div>      
         
@@ -137,18 +146,18 @@ $stockList = fetchAllStockSymbols();
         </div>      
         
         <div class="input-group">
-          <span class="input-group-addon" id="basic-addon1">Percent declined from yesterday:</span>
+          <span class="input-group-addon" id="basic-addon1">% declined from yesterday:</span>
           <input type="text" id="perDeclinedYest" class="form-control" placeholder="Example: 5" aria-describedby="basic-addon1"
           onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
         </div>        
         
         <div class="input-group">
-          <span class="input-group-addon" id="basic-addon1">At least doubled from daily avg vol in todays trading:</span>
+          <span class="input-group-addon" id="basic-addon1">Doubled from daily avg vol in todays trading:</span>
           <input id="dailyAvgVol" class="checkbox_left" type="checkbox" checked="checked"></input>
         </div>
         
         <div class="input-group">
-          <span class="input-group-addon" id="basic-addon1">With gap in trading in the last trading sessions:</span>
+          <span class="input-group-addon" id="basic-addon1">Days gap in trading:</span>
           <input type="text" id="gapTrading" class="form-control" placeholder="Example: 5" aria-describedby="basic-addon1"
           onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
         </div>                
@@ -170,26 +179,48 @@ $stockList = fetchAllStockSymbols();
         ?>    
         
     </div>
-  </div>
+  </div> 
+
 </body>
 
-<script type="application/javascript">
+<script type="text/javascript">
     function submit(){
-        var minPrice = document.getElementById("minPrice").value;
-        var maxPrice = document.getElementById("maxPrice").value;
-        var minBeta  = document.getElementById("minBeta").value;
-       var minShares = document.getElementById("minShares").value;
-       var maxShares = document.getElementById("maxShares").value;
-      var declined52 = document.getElementById("declined52").value;
-  var monthsSIGrowth = document.getElementById("monthsSIGrowth").value;
-var perDeclinedYest  = document.getElementById("perDeclinedYest").value;
-     var dailyAvgVol = document.getElementById("dailyAvgVol").value;
-     var gapTrading  = document.getElementById("gapTrading").value;
+        
+      $('#loading_spinner').show();
       
-  
-  
+      setCookie("minPrice",document.getElementById("minPrice").value,90);
+      setCookie("maxPrice",document.getElementById("maxPrice").value,90);
+      setCookie("minBeta",document.getElementById("minBeta").value,90);
+      setCookie("minShares",document.getElementById("minShares").value,90);
+      setCookie("maxShares",document.getElementById("maxShares").value,90);
+      setCookie("declinedYear",document.getElementById("declinedYear").value,90);
+      setCookie("monthsSIGrowth",document.getElementById("monthsSIGrowth").value,90);
+      setCookie("perDeclinedYest",document.getElementById("perDeclinedYest").value,90);
+      setCookie("dailyAvgVol",document.getElementById("dailyAvgVol").value,90);
+      setCookie("gapTrading",document.getElementById("gapTrading").value,90);
+      
+        var post_data = "minPrice="+minPrice.value+"&maxPrice="+maxPrice.value+"&minBeta="+minBeta.value+"&minShares="+minShares.value
+        +"&maxShares="+maxShares.value+"&declinedYear="+declinedYear.value+"&monthsSIGrowth="+monthsSIGrowth.value
+        +"&perDeclinedYest="+perDeclinedYest.value+"&dailyAvgVol="+dailyAvgVol.value+"&gapTrading="+gapTrading.value;
+        
+        
+        $.ajax({
+            url: 'find_eligible_stocks.php?'+post_data,
+            type: 'POST',
+            data: post_data,
+            dataType: 'html',
+            success: function(data) {
+                $('.b').html(data);
+                $('#loading_spinner').hide();
+            },
+            error: function() {
+                alert("Something went wrong!");
+            }
+        });  
     }
-    
 </script>
+
+
+
 
 </html>
